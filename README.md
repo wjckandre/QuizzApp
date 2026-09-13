@@ -1,16 +1,36 @@
-# React + Vite
+# QuizMaster
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Quiz en temps reel avec rooms, buzzer, admin et scores.
 
-Currently, two official plugins are available:
+## Lancer en local
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Dans deux terminaux :
 
-## React Compiler
+```powershell
+npm.cmd install
+npm.cmd run server
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Puis :
 
-## Expanding the Oxlint configuration
+```powershell
+npm.cmd run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Ouvre http://localhost:5173.
+
+## Production
+
+```powershell
+npm.cmd run build
+npm.cmd start
+```
+
+Le serveur est disponible sur http://localhost:3001.
+
+Pour deployer sur Render :
+
+```text
+Build Command: npm install && npm run build
+Start Command: npm start
+```
