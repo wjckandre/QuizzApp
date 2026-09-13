@@ -9,6 +9,7 @@ const httpServer = createServer(app)
 const io = new Server(httpServer, { cors: { origin: '*' } })
 const rooms = new Map()
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url))
+const slideCounts = { 'Échauffement': 16, 'L atelier': 1, 'Lore très obscur': 1, 'Contexte': 1, 'Trucs aléatoires': 1 }
 
 app.get('/api/health', (_request, response) => response.json({ ok: true, rooms: rooms.size }))
 app.use(express.static(path.join(currentDirectory, 'dist')))
@@ -32,6 +33,9 @@ function stateFor(room) {
   return {
     code: room.code,
     round: room.round,
+    phase: room.phase,
+    category: room.category,
+    slide: room.slide,
     winner: room.winner,
     players: [...room.players.values()],
   }
@@ -47,7 +51,7 @@ function getRoom(socket) {
 
 io.on('connection', (socket) => {
   socket.on('create-room', (callback) => {
-    const room = { code: makeCode(), adminId: socket.id, round: 4, winner: null, players: new Map() }
+    const room = { code: makeCode(), adminId: socket.id, round: 1, phase: 'question', category: 'Échauffement', slide: 0, winner: null, players: new Map() }
     rooms.set(room.code, room)
     socket.data.roomCode = room.code
     socket.data.role = 'admin'
@@ -71,7 +75,7 @@ io.on('connection', (socket) => {
 
   socket.on('buzz', () => {
     const room = getRoom(socket)
-    if (!room || socket.data.role !== 'player' || room.winner) return
+    if (!room || socket.data.role !== 'player' || room.phase !== 'buzz' || room.winner) return
     const player = room.players.get(socket.id)
     if (!player) return
     room.winner = { id: player.id, name: player.name }
@@ -81,8 +85,31 @@ io.on('connection', (socket) => {
   socket.on('next-round', () => {
     const room = getRoom(socket)
     if (!room || room.adminId !== socket.id) return
-    room.round = room.round >= 10 ? 1 : room.round + 1
+    if (room.phase === 'question') {
+      room.phase = 'buzz'
+    } else {
+      room.round = room.round >= 10 ? 1 : room.round + 1
+      room.phase = 'question'
+    }
     room.winner = null
+    broadcast(room)
+  })
+
+  socket.on('presentation-category', (category) => {
+    const room = getRoom(socket)
+    if (!room || room.adminId !== socket.id || !slideCounts[category]) return
+    room.category = category
+    room.slide = 0
+    room.phase = 'question'
+    room.winner = null
+    broadcast(room)
+  })
+
+  socket.on('presentation-slide', (direction) => {
+    const room = getRoom(socket)
+    if (!room || room.adminId !== socket.id || room.phase !== 'question') return
+    const lastSlide = slideCounts[room.category] - 1
+    room.slide = Math.max(0, Math.min(lastSlide, room.slide + (direction === 'next' ? 1 : -1)))
     broadcast(room)
   })
 
