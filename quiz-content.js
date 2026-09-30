@@ -20,7 +20,9 @@ export const slides = {
     { title: "L'atelier, ma deuxième maison" },
     { title: 'Quel est le code du cadenas de l’armoire de la M109 ?', answer: '13-3-21' },
     { title: 'De quelle franchise provient ce jouet ?', answer: 'Kinder Surprise', image: '/atelier/poney.png' },
-  ],
+    { title: 'tuturu', answer: 'oui', media: { type: 'audio', src: '/videos/Tuturu_.mp3' } },
+    { title: 'CLEM', answer: 'clem', media: { type: 'video', src: '/videos/damedane_clem.mp4' } },
+],
   'Lore très obscur': [
     { title: 'Lore très (très) obscur', image: '/slides/stonksandre.png' },
   ],

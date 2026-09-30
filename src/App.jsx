@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { io } from 'socket.io-client'
 import { categories, defaultCategory, slides } from '../quiz-content.js'
 import './App.css'
@@ -7,7 +7,6 @@ function App() {
   const [socket] = useState(() => io())
   const [view, setView] = useState('home')
   const [role, setRole] = useState('')
-  const [roomCode, setRoomCode] = useState('')
   const [playerName, setPlayerName] = useState('')
   const [players, setPlayers] = useState([])
   const [winner, setWinner] = useState(null)
@@ -17,6 +16,9 @@ function App() {
   const [slide, setSlide] = useState(0)
   const [error, setError] = useState('')
   const [scorePoints, setScorePoints] = useState(10)
+  const [mediaError, setMediaError] = useState('')
+  const mediaRef = useRef(null)
+  const currentSlideRef = useRef({ category, slide })
 
   const sortedPlayers = useMemo(() => [...players].sort((a, b) => b.score - a.score), [players])
   const currentSlides = slides[category] ?? []
@@ -24,7 +26,10 @@ function App() {
 
   useEffect(() => {
     const updateRoom = (state) => {
-      setRoomCode(state.code)
+      if (state.category !== currentSlideRef.current.category || state.slide !== currentSlideRef.current.slide) {
+        setMediaError('')
+      }
+      currentSlideRef.current = { category: state.category, slide: state.slide }
       setPlayers(state.players)
       setWinner(state.winner)
       setRound(state.round)
@@ -34,16 +39,32 @@ function App() {
     }
     const closeRoom = () => {
       setError('La room a ete fermee.')
+      setRole('')
+      setPlayers([])
       setView('home')
     }
     const connectionError = () => setError('Serveur indisponible. Lancez npm.cmd run server.')
+    const playRoomMedia = (request) => {
+      const current = currentSlideRef.current
+      if (request.category !== current.category || request.slide !== current.slide) return
+      mediaRef.current?.play().catch(() => setMediaError('Lecture automatique bloquée. Utilisez le bouton de lecture du lecteur.'))
+    }
+    const pauseRoomMedia = (request) => {
+      const current = currentSlideRef.current
+      if (request.category !== current.category || request.slide !== current.slide) return
+      mediaRef.current?.pause()
+    }
     socket.on('room-state', updateRoom)
     socket.on('room-closed', closeRoom)
     socket.on('connect_error', connectionError)
+    socket.on('slide-media-play', playRoomMedia)
+    socket.on('slide-media-pause', pauseRoomMedia)
     return () => {
       socket.off('room-state', updateRoom)
       socket.off('room-closed', closeRoom)
       socket.off('connect_error', connectionError)
+      socket.off('slide-media-play', playRoomMedia)
+      socket.off('slide-media-pause', pauseRoomMedia)
     }
   }, [socket])
 
@@ -51,13 +72,12 @@ function App() {
     if (!response.ok) return setError(response.error)
     setError('')
     setRole('admin')
-    setRoomCode(response.code)
     setView('room')
   })
 
   const joinRoom = (event) => {
     event.preventDefault()
-    socket.emit('join-room', { code: roomCode, name: playerName }, (response) => {
+    socket.emit('join-room', { name: playerName }, (response) => {
       if (!response.ok) return setError(response.error)
       setError('')
       setRole('player')
@@ -72,23 +92,37 @@ function App() {
     })
   }
 
+  const playCurrentMedia = () => {
+    if (!currentSlide?.media) return
+    setMediaError('')
+    if (mediaRef.current) {
+      mediaRef.current.currentTime = 0
+      mediaRef.current.play().catch(() => setMediaError('Lecture automatique bloquée. Utilisez le bouton de lecture du lecteur.'))
+    }
+    socket.emit('play-slide-media')
+  }
+
+  const pauseCurrentMedia = () => {
+    mediaRef.current?.pause()
+    socket.emit('pause-slide-media')
+  }
+
   return (
     <main className="app">
       {view === 'home' && <section className="start-screen">
         <h1>QuizMaster</h1>
         <p>Quiz en temps reel avec buzzer.</p>
         <div className="start-actions">
-          <button className="button primary" onClick={createRoom}>Creer une room</button>
-          <button className="button" onClick={() => { setError(''); setView('join') }}>Rejoindre une room</button>
+          <button className="button primary" onClick={createRoom}>Ouvrir la room (admin)</button>
+          <button className="button" onClick={() => { setError(''); setView('join') }}>Rejoindre comme joueur</button>
         </div>
         {error && <p className="error">{error}</p>}
       </section>}
 
       {view === 'join' && <section className="form-screen">
         <button className="link-button" onClick={() => setView('home')}>Retour</button>
-        <h1>Rejoindre une room</h1>
+        <h1>Rejoindre le quiz</h1>
         <form onSubmit={joinRoom}>
-          <label>Code de la room<input value={roomCode} onChange={(event) => setRoomCode(event.target.value.toUpperCase())} placeholder="QZ-123" maxLength={6} required /></label>
           <label>Votre pseudo<input autoFocus value={playerName} onChange={(event) => setPlayerName(event.target.value)} placeholder="Ex. Alex" required /></label>
           {error && <p className="error">{error}</p>}
           <button className="button primary" type="submit">Entrer dans la room</button>
@@ -98,20 +132,20 @@ function App() {
       {view === 'room' && <section className="room-screen">
         <header className="room-header">
           <div><h1>QuizMaster</h1><span className="role">{role === 'admin' ? 'Administrateur' : 'Joueur'}</span></div>
-          <div className="room-id">Room <strong>{roomCode}</strong><button onClick={() => navigator.clipboard?.writeText(roomCode)}>Copier</button></div>
+          <div className="room-id">Quiz en direct</div>
         </header>
         {role === 'player' && phase === 'buzz' ? <div className="player-buzzer-only">
           <span className={`player-buzzer-status ${phase === 'buzz' ? 'open' : ''}`}>{winner ? 'Buzzer verrouille' : phase === 'buzz' ? 'Buzzer ouvert' : 'En attente de l admin'}</span>
           <button className={`buzzer ${winner || phase !== 'buzz' ? 'disabled' : ''}`} onClick={() => socket.emit('buzz')} disabled={Boolean(winner) || phase !== 'buzz'}>{winner ? 'BUZZER VERROUILLE' : phase === 'buzz' ? 'BUZZER' : 'BUZZER FERME'}</button>
           {winner && <div className="player-winner-note">{winner.name} a buzze en premier.</div>}
         </div> : role === 'admin' && phase === 'buzz' ? <div className="admin-buzz-layout">
-          <section className="admin-status"><div className="question-meta"><span>Buzzer ouvert</span></div>{winner ? <><div className="admin-winner"><span className="winner-check">✓</span><div><small>PREMIER BUZZ</small><strong>{winner.name}</strong><span>Le buzzer est verrouille</span></div></div><div className="score-controls"><label>Points<input type="number" min="-1000" max="1000" step="1" value={scorePoints} onChange={(event) => setScorePoints(event.target.value)} /></label><button className="button primary" onClick={() => awardPoints()}>Attribuer les points</button><button className="button" onClick={() => awardPoints(-Math.abs(Number(scorePoints)))}>Retirer</button></div></> : <div className="admin-waiting"><strong>En attente d'un buzzer</strong><p>Le premier joueur qui appuie sera affiche ici.</p></div>}</section>
+          <section className="admin-status"><div className="question-meta"><span>{winner ? 'Buzzer verrouille' : 'Buzzer ouvert'}</span></div>{winner ? <><div className="admin-winner"><span className="winner-check">✓</span><div><small>PREMIER BUZZ</small><strong>{winner.name}</strong><span>Le buzzer est verrouille</span></div></div><div className="score-controls"><label>Points<input type="number" min="-1000" max="1000" step="1" value={scorePoints} onChange={(event) => setScorePoints(event.target.value)} /></label><button className="button primary" onClick={() => awardPoints()}>Attribuer les points</button><button className="button" onClick={() => awardPoints(-Math.abs(Number(scorePoints)))}>Retirer</button><button className="button" onClick={() => socket.emit('unlock-buzzer')}>Réponse fausse, déverrouiller</button></div></> : <div className="admin-waiting"><strong>En attente d'un buzzer</strong><p>Le premier joueur qui appuie sera affiche ici.</p></div>}</section>
           <aside className="players-box"><h2>Joueurs ({players.length})</h2><ul>{sortedPlayers.map((player) => <li className={winner?.id === player.id ? 'winner' : ''} key={player.id}><span className={`avatar ${player.color}`}>{player.initials}</span><span>{player.name}<small>En ligne</small></span><strong>{player.score} pts</strong></li>)}</ul></aside>
         </div> : <div className="presentation-layout">
           <nav className="category-grid">{categories.map((item) => <button className={item === category ? 'selected' : ''} disabled={role !== 'admin'} key={item} onClick={() => socket.emit('presentation-category', item)}>{item}</button>)}</nav>
           <section className="presentation-stage">
             <div className="slide-count">{currentSlide ? `${slide + 1} / ${currentSlides.length}` : 'Aucune slide'}</div>
-            <div className="slide-content"><h2>{currentSlide?.title ?? 'Aucune slide disponible'}</h2>{currentSlide?.image && <img src={currentSlide.image} alt="" />}{role === 'admin' && currentSlide?.answer && <p className="slide-answer">{currentSlide.answer}</p>}</div>
+            <div className="slide-content"><h2>{currentSlide?.title ?? 'Aucune slide disponible'}</h2>{currentSlide?.image && <img src={currentSlide.image} alt="" />}{currentSlide?.media?.type === 'video' && <video className="slide-media" ref={mediaRef} src={currentSlide.media.src} playsInline preload="metadata" controls={Boolean(mediaError)} />}{currentSlide?.media?.type === 'audio' && <audio ref={mediaRef} src={currentSlide.media.src} preload="metadata" controls={Boolean(mediaError)} />}{role === 'admin' && currentSlide?.media && <div className="media-actions"><button className="button primary media-play" onClick={playCurrentMedia}>Lire {currentSlide.media.type === 'video' ? 'la vidéo' : 'l’audio'}</button><button className="button media-play" onClick={pauseCurrentMedia}>Pause</button></div>}{mediaError && <p className="error media-error">{mediaError}</p>}{role === 'admin' && currentSlide?.answer && <p className="slide-answer">{currentSlide.answer}</p>}</div>
             <button className="slide-arrow previous" disabled={role !== 'admin' || slide === 0} onClick={() => socket.emit('presentation-slide', 'previous')} aria-label="Slide précédente">‹</button>
             <button className="slide-arrow next" disabled={role !== 'admin' || slide >= currentSlides.length - 1} onClick={() => socket.emit('presentation-slide', 'next')} aria-label="Slide suivante">›</button>
           </section>
