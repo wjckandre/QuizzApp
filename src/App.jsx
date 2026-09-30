@@ -1,26 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { io } from 'socket.io-client'
+import { categories, defaultCategory, slides } from '../quiz-content.js'
 import './App.css'
-
-const categories = ['Échauffement', 'L atelier', 'Lore très obscur', 'Contexte', 'Trucs aléatoires']
-const slides = {
-  'Échauffement': [
-    { title: 'Échauffement', image: '/slides/2022compet.png' },
-    { title: "En quelle année l'équipe Stan Robotix a-t-elle été créée ?", answer: '2016' },
-    { title: 'Qui sont les membres fondateurs de Stan Robotix ?', answer: 'Derek et Mikael' },
-    { title: 'Robotix lore', image: '/slides/ROBOTIXLORE.png' },
-    { title: 'Quand il n’y a pas Robotix', image: '/slides/norobotixbottomtext.png' },
-    { title: 'Actual gameplay', image: '/slides/culte.png' },
-  ],
-  'L atelier': [
-    { title: "L'atelier, ma deuxième maison" },
-    { title: 'Quel est le code du cadenas de l’armoire de la M109 ?', answer: '13-3-21' },
-    { title: 'De quelle franchise provient ce jouet ?', answer: 'Kinder Surprise', image: '/atelier/poney.png' },
-  ],
-  'Lore très obscur': [{ title: 'Lore très (très) obscur', image: '/slides/stonksandre.png' }],
-  Contexte: [{ title: '« Contexte ? »', image: '/slides/visibleconfusionmax.jpg' }],
-  'Trucs aléatoires': [{ title: 'Trucs aléatoires', image: '/slides/whenréu.png' }],
-}
 
 function App() {
   const [socket] = useState(() => io())
@@ -32,12 +13,14 @@ function App() {
   const [winner, setWinner] = useState(null)
   const [round, setRound] = useState(1)
   const [phase, setPhase] = useState('question')
-  const [category, setCategory] = useState('Échauffement')
+  const [category, setCategory] = useState(defaultCategory)
   const [slide, setSlide] = useState(0)
   const [error, setError] = useState('')
   const [scorePoints, setScorePoints] = useState(10)
 
   const sortedPlayers = useMemo(() => [...players].sort((a, b) => b.score - a.score), [players])
+  const currentSlides = slides[category] ?? []
+  const currentSlide = currentSlides[slide]
 
   useEffect(() => {
     const updateRoom = (state) => {
@@ -127,10 +110,10 @@ function App() {
         </div> : <div className="presentation-layout">
           <nav className="category-grid">{categories.map((item) => <button className={item === category ? 'selected' : ''} disabled={role !== 'admin'} key={item} onClick={() => socket.emit('presentation-category', item)}>{item}</button>)}</nav>
           <section className="presentation-stage">
-            <div className="slide-count">{slide + 1} / {slides[category].length}</div>
-            <div className="slide-content"><h2>{slides[category][slide].title}</h2>{slides[category][slide].image && <img src={slides[category][slide].image} alt="" />}{slides[category][slide].answer && <p className="slide-answer">{slides[category][slide].answer}</p>}</div>
+            <div className="slide-count">{currentSlide ? `${slide + 1} / ${currentSlides.length}` : 'Aucune slide'}</div>
+            <div className="slide-content"><h2>{currentSlide?.title ?? 'Aucune slide disponible'}</h2>{currentSlide?.image && <img src={currentSlide.image} alt="" />}{role === 'admin' && currentSlide?.answer && <p className="slide-answer">{currentSlide.answer}</p>}</div>
             <button className="slide-arrow previous" disabled={role !== 'admin' || slide === 0} onClick={() => socket.emit('presentation-slide', 'previous')} aria-label="Slide précédente">‹</button>
-            <button className="slide-arrow next" disabled={role !== 'admin' || slide === slides[category].length - 1} onClick={() => socket.emit('presentation-slide', 'next')} aria-label="Slide suivante">›</button>
+            <button className="slide-arrow next" disabled={role !== 'admin' || slide >= currentSlides.length - 1} onClick={() => socket.emit('presentation-slide', 'next')} aria-label="Slide suivante">›</button>
           </section>
           <aside className="score-strip"><strong>Scores</strong>{sortedPlayers.length === 0 && <span className="muted">En attente des joueurs...</span>}{sortedPlayers.map((player) => <span className="team-score" key={player.id}><i className={`avatar ${player.color}`}>{player.initials}</i>{player.name}<b>{player.score}</b></span>)}</aside>
         </div>}

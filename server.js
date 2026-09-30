@@ -1,5 +1,6 @@
 import express from 'express'
 import { createServer } from 'node:http'
+import { stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Server } from 'socket.io'
@@ -9,7 +10,14 @@ const httpServer = createServer(app)
 const io = new Server(httpServer, { cors: { origin: '*' } })
 const rooms = new Map()
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url))
-const slideCounts = { 'Échauffement': 16, 'L atelier': 1, 'Lore très obscur': 1, 'Contexte': 1, 'Trucs aléatoires': 1 }
+const quizContentUrl = new URL('./quiz-content.js', import.meta.url)
+
+async function getQuizContent() {
+  const { mtimeMs, ctimeMs } = await stat(quizContentUrl)
+  const moduleUrl = new URL(quizContentUrl)
+  moduleUrl.searchParams.set('updated', `${mtimeMs}-${ctimeMs}`)
+  return import(moduleUrl.href)
+}
 
 app.get('/api/health', (_request, response) => response.json({ ok: true, rooms: rooms.size }))
 app.use(express.static(path.join(currentDirectory, 'dist')))
@@ -50,8 +58,9 @@ function getRoom(socket) {
 }
 
 io.on('connection', (socket) => {
-  socket.on('create-room', (callback) => {
-    const room = { code: makeCode(), adminId: socket.id, round: 1, phase: 'question', category: 'Échauffement', slide: 0, winner: null, players: new Map() }
+  socket.on('create-room', async (callback) => {
+    const { defaultCategory } = await getQuizContent()
+    const room = { code: makeCode(), adminId: socket.id, round: 1, phase: 'question', category: defaultCategory, slide: 0, winner: null, players: new Map() }
     rooms.set(room.code, room)
     socket.data.roomCode = room.code
     socket.data.role = 'admin'
@@ -95,9 +104,10 @@ io.on('connection', (socket) => {
     broadcast(room)
   })
 
-  socket.on('presentation-category', (category) => {
+  socket.on('presentation-category', async (category) => {
     const room = getRoom(socket)
-    if (!room || room.adminId !== socket.id || !slideCounts[category]) return
+    const { categories } = await getQuizContent()
+    if (!room || room.adminId !== socket.id || !categories.includes(category)) return
     room.category = category
     room.slide = 0
     room.phase = 'question'
@@ -105,10 +115,11 @@ io.on('connection', (socket) => {
     broadcast(room)
   })
 
-  socket.on('presentation-slide', (direction) => {
+  socket.on('presentation-slide', async (direction) => {
     const room = getRoom(socket)
+    const { slides } = await getQuizContent()
     if (!room || room.adminId !== socket.id || room.phase !== 'question') return
-    const lastSlide = slideCounts[room.category] - 1
+    const lastSlide = slides[room.category].length - 1
     room.slide = Math.max(0, Math.min(lastSlide, room.slide + (direction === 'next' ? 1 : -1)))
     broadcast(room)
   })
