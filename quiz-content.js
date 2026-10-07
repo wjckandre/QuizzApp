@@ -118,14 +118,35 @@ export const slides = {
     { title: 'Quel composant remplacera le RoborIO ?' },
     { title: 'L’année passée, en quelle position a terminé Stan Robotix à la fin de la phase de qualification ?' },
     { title: 'Si tu as plus de 20 ans, oublie' },
+    { title: 'Donner les noms des deux derniers robots.'},
   ],
 
   'Rivalité construction / programmation': [
     { title: 'Rivalité construction / programmation', image: '/slides/whenréu.png' },
+    { title: 'Citer 5 chefs de construction.'},
+    { title: 'À quoi correspondent les termes 3/8 et 4mm ?', answer: 'une clé mixte à œil et à fourche et une clé hexagonale'},
+    { title: 'Expliquer la différence entre une vis, un écrou et un boulon.'},
+    { title: 'Quelle est la différence entre l’acrylique et le polycarbonate ?'},
+    { title: 'Compléter les deux branches vides.', image: '/slides/flowchart.png'},
+    { title: 'Réponse', image: '/slides/flowchart2.png'},
+    { title: 'Citer 5 chefs de programmation.'},
+    { title: 'Quel logiciel utilisé de 2019 à 2022 a été à l’origine de la pandémie de Covid-19 ?'},
+    { title: 'Si je souhaite me faire cuire un œuf, sur quel composant dois-je le mettre ?'},
+    { title: 'Quel mot de passe constitué uniquement de chiffres, mais pas 6622, était utilisé il y a longtemps sur les laptops ?'},
+    { title: 'En Command-Based, la classe RobotContainer permet de lier des commandes à une manette. Quel est son ancien nom d’avant la mise à jour de 2021-2022 ?'},
   ],
 
   'Blindtest': [
     { title: 'Blindtest', image: '/slides/whenréu.png' },
+    { title: '', media: {type: 'audio', src: '/blindtest/fin.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/deepspace.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/crescendo.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/dive.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/autonome.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/rebuilt.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/promo.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/teleop.mp3'}},
+    { title: '', media: {type: 'audio', src: '/blindtest/timeless.mp3'}},
   ],
 
   'GP Explorer': [
@@ -144,9 +165,22 @@ export const slides = {
     { title: 'Quiz des équipes FRC au Québec', image: '/slides/whenréu.png' },
   ],
 
-  'Fou de compétitions FRC': [
-    { title: ' Fou de compétitions FRC', image: '/slides/whenréu.png' },
+ 'Fou de compétitions FRC': [
+    { title: 'Fou de compétitions FRC', image: '/slides/whenréu.png' },
+    { title: 'À quoi servent les deux boutons dans la zone des pilotes, sur le terrain ?'},
+    { title: 'Lors de quelle compétition y-avait-il des joueurs humains sur le terrain pendant le match ?'},
+    { title: 'Comment s’appelle la mascotte de Robotique First Québec ?'},
+    { title: 'Blip', image: '/frc/blip.png'},
+    { title: 'À 30 points près, quel est le record absolu de points marqués lors d’une compétition, toutes saisons et régions confondues ?'},
+    { title: 'Plainfield District Event', image: '/frc/score.png'},
+    { title: 'Quelle est la différence entre les casquettes jaunes et les casquettes oranges ?', image: '' },
+    { title: 'Nommer 4 des 8 divisions au FIRST Championship ?'},
+    { title: 'Il est possible de contrôler le robot avec plusieurs appareils / manettes. Quelle règle principale doivent-ils respecter ?'},
+    { title: 'Quelle est la différence entre le système de compétition par District et par Regional ?'},
+    { title: 'Avant de se dérouler à Houston mais après St. Louis, où se passait le FIRST Championship ?'},
+    { title: 'Combien d’écussons sont distribués à chaque équipe lorsqu’elles arrivent sur le site de la compétition ?', image: '/frc/pin.png' },
   ],
+
 
   '« Alors comme ça tu aimes les robots ? »': [
     { title: '« Alors comme ça tu aimes les robots ? »'},
