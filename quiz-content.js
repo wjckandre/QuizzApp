@@ -1,9 +1,9 @@
 export const slides = {
-  'Presentation': [
+  Presentation: [
     { title: 'Presentation', image: '/slides/presentation.png' },
   ],
   'Échauffement': [
-    { title: "En quelle année l’équipe Stan Robotix a-t-elle été créée ?", answer: '2016 (1 pt)' },
+    { title: 'En quelle année l’équipe Stan Robotix a-t-elle été créée ?', answer: '2016 (1 pt)' },
     { title: 'Qui sont les capitaines de la première année ?', answer: 'Derek et Mikael (1 pt)' },
     { title: 'Qui sont les capitaines cette année ?', answer: 'Timothée et Alban (1 pt)' },
     { title: 'Quel est le numéro et le nom de l’équipe québécoise possédant les mêmes chiffres que Stan Robotix ?', answer: '2626 Évolution (1 + 1 pt)' },
@@ -16,27 +16,44 @@ export const slides = {
   ],
   'L atelier': [
     { title: "L'atelier, ma deuxième maison" },
-    { title: 'Quel est le code du cadenas de l’armoire de la M109 ?', answer: '13-3-21' },
-    { title: 'De quelle franchise provient ce jouet ?', answer: 'Kinder Surprise', image: '/atelier/poney.png' },
+    { title: 'Quel est le numéro de la salle de l’atelier ?', answer: 'M105-A (1 pt)' },
+    { title: 'Quel est le code du cadenas de l’armoire de la M109 ?', answer: '13-3-21 (2 pt)' },
+    { title: 'Sur le poster Disney de l’atelier, un nom est inscrit sur chaque princesse. Donner un nom et sa princesse.', answer: 'Philippe et Blanche-Neige, Simone et Cendrillon, Mohammad et Jasmine, Maxime (Pageot) et Belle, Design et Ariel, Mathias et Aurore (2 pt)' },
+    { title: 'Quels sont les 5 états de batterie indiqués sur l’armoire des ordinateurs ?', answer: 'Mort, half-life, almost ok, ok!, ABSOLUTE ENERGY. (3 pt)' },
+    { title: 'De quelle franchise provient ce jouet ?', answer: 'Kinder Surprise (Maxi) / pas My Little Pony (1 pt)', image: '/atelier/poney.png' },
+    { title: 'Quel personnage de film a été imprimé en 3D avec la tête de Dwayne Johnson (The Rock) dessus ?', answer: 'Grogu (The Mandalorian) (1 pt)' },
+    { title: 'Sur l’affiche bleu ciel présentant le club, comment est orthographié Stan Robotix ?', answer: 'cs au lieu de x (1 pt)' },
+    { title: 'Sur quel média peut-on voir cette photo ?', answer: 'Un journal (L’Express d’Outremont) (1 pt)' },
+    { title: 'Sur quelle salle donne la porte dans l’atelier ?', answer: 'La salle des serveurs (1 pt)' },
     { title: 'tuturu', answer: 'oui', media: { type: 'audio', src: '/videos/Tuturu_.mp3' } },
     { title: 'CLEM', answer: 'clem', media: { type: 'video', src: '/videos/damedane_clem.mp4' } },
-],
+  ],
   'Lore très obscur': [
     { title: 'Lore très (très) obscur' },
-    { title: 'À quoi fais-je référence ?', answer: 'le morceau de la pente coupé du robot en 2019 (1 pt)'},
-    { title: 'Compléter les termes suivants :', answer: 'Bahaye (2 pt)'},
-    { title: 'Quel est l’élément le moins corrélé relié à la victoire de Robotix ? ', answer: 'Mohammad n’est pas en voyage à l’extérieur du Canada (2 pt)'},
-    { title: 'Comment s’appelle la première relique ?', answer: 'le saint-angle (1 pt)'},
-    { title: 'Qui est, par défaut, le chef sécurité ?', answer: 'Jésus (1 pt)'},
-    { title: 'À quoi font référence « le Français » et « le communiste » ?', answer: 'aux premiers laptops. (1 pt)'},
-    { title: 'Pourquoi est-ce que Stan Robotix se transforme en maison de retraite ?', answer: 'le nombre de mentors augmente chaque année (1 pt)'},
-    { title: 'Quel capitaine à déjà volé lors d’un Gala ?', answer: 'Philippe (2 pt)'},
-    { title: 'Dans ses premières années, Stan Robotix aurait pu se convertir en club de fitness car un objet important était manquant ou se brisait souvent. Lequel ?', answer: 'un chariot (faire des squats en soulevant le robot) (2 pt)'},
-    { title: 'Sur ce diagramme, où se situe le régime politique Robotixien ?', answer: 'authoritarian left (régime autocratique communiste) (1 pt)'},  
-
+    { title: 'À quoi fais-je référence ?', answer: 'Le morceau de la pente coupé du robot en 2019 (1 pt)' },
+    { title: 'Compléter les termes suivants : Gros [...], Vidéo Epic (fou [...]), Build the [...] Indice : Joshua', answer: 'Bahaye (2 pt)' },
+    { title: 'Selon la légende, les problèmes de communications avec le robot lors des compétitions sont dus à quoi ?', answer: 'Mohammad n’est pas en voyage à l’extérieur du Canada (2 pt)' },
+    { title: 'Quel est l’élément le moins corrélé relié à la victoire de Robotix ?', answer: 'Le manque de communication? (2 pt)' },
+    { title: 'Comment s’appelle la première relique ?', answer: 'Le saint-angle (1 pt)' },
+    { title: 'Qui est, par défaut, le chef sécurité ?', answer: 'Jésus (1 pt)' },
+    { title: 'À quoi font référence « le Français » et « le communiste » ?', answer: 'Aux premiers laptops (1 pt)' },
+    { title: 'Pourquoi est-ce que Stan Robotix se transforme en maison de retraite ?', answer: 'Le nombre de mentors augmente chaque année (1 pt)' },
+    { title: 'Quel capitaine a déjà volé lors d’un Gala ?', answer: 'Philippe (2 pt)' },
+    { title: 'Dans ses premières années, Stan Robotix aurait pu se convertir en club de fitness car un objet important était manquant ou se brisait souvent. Lequel ?', answer: 'Un chariot (faire des squats en soulevant le robot) (2 pt)' },
+    { title: 'Sur ce diagramme, où se situe le régime politique Robotixien ?', answer: 'Authoritarian left (régime autocratique communiste) (1 pt)' },
   ],
-  'Contexte': [
+  Contexte: [
     { title: '« Contexte ? »', image: '/slides/visibleconfusionmax.jpg' },
+    { title: 'Hyperion (mentors) vient gentiment nous aider à réparer le robot, SANS AUCUNE MESURE DE SÉCURITÉ (pas de gants, scie sauteuse dans l’air).' },
+    { title: 'Max consolant un Victor déçu de sa performance à un match éliminatoire de la compétition Betabot 2019 (il a heurté plusieurs fois les murs du terrain = pénalités).' },
+    { title: 'Vieilles batteries endommagées, scellées (avec du bicarbonate de soude) pour éviter tout risque d’incendie.' },
+    { title: 'Résultats des portes ouvertes 2023 (Stan avait préparé un buffet de malade, mais presque rien a été consommé).' },
+    { title: 'Crashout de Damien (démontage de la base swerve pour nettoyage + fatigue = crashout).' },
+    { title: 'Un des anciens fonds d’écran des laptops. Photo prise avec la limelight.' },
+    { title: 'Ouverture du RoborIO après plusieurs années de construction sans faire attention à la poussière de métal.' },
+    { title: 'Betabot 2021 ? (l’équipe avec sa scie sauteuse) — mettre la vidéo après.' },
+    { title: 'Clavier squishable ?' },
+    { title: 'Inspecteur sur les photos ?' },
   ],
   'Trucs aléatoires': [
     { title: 'Trucs aléatoires', image: '/slides/whenréu.png' },
@@ -48,6 +65,7 @@ export const slides = {
     { title: 'Quelle disposition de panneau électrique n’a JAMAIS été mise sur un robot de compétition ?', answer: 'Un panneau vertical en deux couches (mais ça aurait pu arriver en 2022) (1 pt)' },
     { title: 'Combien de fois les climbers se sont-ils brisés la veille de la compétition ?', answer: '2 (1 pt)' },
     { title: 'Quelle(s) sous-équipe(s) change(nt) de nom presque chaque année ?', answer: 'Médias et marketing. Au départ : marketing, médias et finances, puis gestion des affaires, entrepreneuriat (marketing, arts et médias), marketing / médias, marketing, entreprenariat (marketing, arts et médias), marketing, gestion, 2024-2025, marketing et médias.' },
+    { title: 'Quelle est la police d’écriture de Stan Robotix parmi : Good Times, Nasalization, Ethnocentric, Conthrax et Nulshock ?', answer: 'Good Times (1 pt)' },
     { title: 'Le système international comporte 7 unités de mesure. Donner au moins deux unités de remplacement purement robotixiennes.', answer: 'Selon la qualité des réponses. Exemples : longueur (Alice-mètre ou Kalo-mètre), temps (45 jours), courant électrique (batterie chargée), intensité lumineuse (Limelight), masse (robot ou Kalo-gramme), quantité de matière (??), température thermodynamique (??).' },
     { title: 'Donner au moins 5 noms de roues utilisées dans un robot.', answer: 'Compliant (intake), plaction / HiGrip (tank), mecanum, omni, billet (swerve), stealth (intake).' },
   ],
@@ -63,7 +81,7 @@ export const slides = {
     { title: 'Quel matériau insolite a servi à fabriquer les bumpers de la compétition Betabot 2016 ?', answer: 'Des jeans (2 pt).' },
     { title: 'Avant l’existence de l’atelier, où travaillait l’équipe pour construire le robot ?', answer: 'À l’École secondaire Loyola (2 pt).' },
   ],
-}
+};
 
-export const categories = Object.keys(slides).filter((category) => slides[category].length > 0)
-export const defaultCategory = categories[0]
+export const categories = Object.keys(slides).filter((category) => slides[category].length > 0);
+export const defaultCategory = categories[0];
