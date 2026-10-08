@@ -145,6 +145,7 @@ export const slides = {
     { title: '', media: {type: 'audio', src: '/blindtest/autonome.mp3'}},
     { title: '', media: {type: 'audio', src: '/blindtest/rebuilt.mp3'}},
     { title: '', media: {type: 'audio', src: '/blindtest/promo.mp3'}},
+    { title: '', media: {type: 'video', src: '/blindtest/promo.mp4'}},
     { title: '', media: {type: 'audio', src: '/blindtest/teleop.mp3'}},
     { title: '', media: {type: 'audio', src: '/blindtest/timeless.mp3'}},
   ],
@@ -163,6 +164,16 @@ export const slides = {
 
   'Quiz des équipes FRC au Québec': [
     { title: 'Quiz des équipes FRC au Québec', image: '/slides/whenréu.png' },
+    { title: '', image: '/equipes/cuivreetor.png'},
+    { title: '', image: '/equipes/expresso.png'},
+    { title: '', image: '/equipes/spartiates.png'},
+    { title: '', image: '/equipes/northemknights.png'},
+    { title: '', image: '/equipes/pls.png'},
+    { title: '', image: '/equipes/rikitik.png'},
+    { title: '', image: '/equipes/patenteux.png'},
+    { title: '', image: '/equipes/westtechpaladins.png'},
+    { title: '', image: '/equipes/tech4kids.png'},
+    { title: '', image: '/equipes/dynamique.png'},
   ],
 
  'Fou de compétitions FRC': [
