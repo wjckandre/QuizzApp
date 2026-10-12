@@ -19,16 +19,16 @@ export const slides = {
     { title: '', image: '/slides/2022memes.png'}
   ],
   'L\'atelier': [
-    { title: "L'atelier, ma deuxième maison" },
+    { title: "L'atelier, ma deuxième maison", image: '/atelier/image.png' },
     { title: 'Quel est le numéro de la salle de l’atelier ?'},
     { title: 'Quel est le code du cadenas de l’armoire de la M109 ?'},
     { title: 'Sur le poster Disney de l’atelier, un nom est inscrit sur chaque princesse. Donner un nom et sa princesse.'},
-    { title: 'Quels sont les 5 états de batterie indiqués sur l’armoire des ordinateurs ?'},
+    { title: 'Quels sont les 5 états de batterie indiqués sur l’armoire des laptops ?'},
     { title: 'De quelle franchise provient ce jouet ?', image: '/atelier/poney.png' },
-    { title: 'Quel personnage de film à été imprimé en 3D avec la tête de Dwayne Johnson (The rock) dessus ?'},
+    { title: 'Quel personnage de film à été imprimé en 3D avec la tête de Dwayne « The Rock » Johnson dessus ?'},
     { title: 'Sur l’affiche bleu ciel présentant le club, comment est orthographié Stan Robotix ?'},
-    { title: 'Sur quel média peut-on voir cette photo ?', image: '/atelier/derek.png' },
-    { title: 'Quel capitaine ou co-capitaine n\'apparait sur aucune photo dans l\'atelier ?', image: '/atelier/derek.png' },
+    { title: 'Combien de coupures de journal étaient affichées dans l\'atelier ?'},
+    { title: 'Où était initialement l\'étau bleu ?', image: '/slides/image.png'},
 ],
   'Lore très (très) obscur': [
     { title: 'Lore très (très) obscur', image: '/lore/lore.png' },
