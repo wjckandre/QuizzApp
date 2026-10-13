@@ -19,10 +19,23 @@ function App() {
   const [mediaError, setMediaError] = useState('')
   const mediaRef = useRef(null)
   const currentSlideRef = useRef({ category, slide })
+  const buzzerAudioRef = useRef(null)
+  const previousRoomStateRef = useRef({ phase: 'question', winner: null })
 
   const sortedPlayers = useMemo(() => [...players].sort((a, b) => b.score - a.score), [players])
   const currentSlides = slides[category] ?? []
   const currentSlide = currentSlides[slide]
+
+  function prepareAudio() {
+    buzzerAudioRef.current ??= new Audio('/videos/Buzzer.mp3')
+  }
+
+  function playBuzzerSound() {
+    const audio = buzzerAudioRef.current
+    if (!audio) return
+    audio.currentTime = 0
+    audio.play().catch((error) => console.error('Impossible de jouer le son du buzzer.', error))
+  }
 
   useEffect(() => {
     const updateRoom = (state) => {
@@ -30,6 +43,11 @@ function App() {
         setMediaError('')
       }
       currentSlideRef.current = { category: state.category, slide: state.slide }
+      const previousRoomState = previousRoomStateRef.current
+      if (state.phase === 'buzz' && previousRoomState.phase === 'buzz' && !previousRoomState.winner && state.winner) {
+        playBuzzerSound()
+      }
+      previousRoomStateRef.current = { phase: state.phase, winner: state.winner }
       setPlayers(state.players)
       setWinner(state.winner)
       setRound(state.round)
@@ -68,15 +86,19 @@ function App() {
     }
   }, [socket])
 
-  const createRoom = () => socket.emit('create-room', (response) => {
-    if (!response.ok) return setError(response.error)
-    setError('')
-    setRole('admin')
-    setView('room')
-  })
+  const createRoom = () => {
+    prepareAudio()
+    socket.emit('create-room', (response) => {
+      if (!response.ok) return setError(response.error)
+      setError('')
+      setRole('admin')
+      setView('room')
+    })
+  }
 
   const joinRoom = (event) => {
     event.preventDefault()
+    prepareAudio()
     socket.emit('join-room', { name: playerName }, (response) => {
       if (!response.ok) return setError(response.error)
       setError('')
@@ -136,7 +158,7 @@ function App() {
         </header>
         {role === 'player' && phase === 'buzz' ? <div className="player-buzzer-only">
           <span className={`player-buzzer-status ${phase === 'buzz' ? 'open' : ''}`}>{winner ? 'Buzzer verrouille' : phase === 'buzz' ? 'Buzzer ouvert' : 'En attente de l admin'}</span>
-          <button className={`buzzer ${winner || phase !== 'buzz' ? 'disabled' : ''}`} onClick={() => socket.emit('buzz')} disabled={Boolean(winner) || phase !== 'buzz'}>{winner ? 'BUZZER VERROUILLE' : phase === 'buzz' ? 'BUZZER' : 'BUZZER FERME'}</button>
+          <button className={`buzzer ${winner || phase !== 'buzz' ? 'disabled' : ''}`} onClick={() => { prepareAudio(); socket.emit('buzz') }} disabled={Boolean(winner) || phase !== 'buzz'}>{winner ? 'BUZZER VERROUILLE' : phase === 'buzz' ? 'BUZZER' : 'BUZZER FERME'}</button>
           {winner && <div className="player-winner-note">{winner.name} a buzze en premier.</div>}
         </div> : role === 'admin' && phase === 'buzz' ? <div className="admin-buzz-layout">
           <section className="admin-status"><div className="question-meta"><span>{winner ? 'Buzzer verrouille' : 'Buzzer ouvert'}</span></div>{winner ? <><div className="admin-winner"><span className="winner-check">✓</span><div><small>PREMIER BUZZ</small><strong>{winner.name}</strong><span>Le buzzer est verrouille</span></div></div><div className="score-controls"><label>Points<input type="number" min="-1000" max="1000" step="1" value={scorePoints} onChange={(event) => setScorePoints(event.target.value)} /></label><button className="button primary" onClick={() => awardPoints()}>Attribuer les points</button><button className="button" onClick={() => awardPoints(-Math.abs(Number(scorePoints)))}>Retirer</button><button className="button" onClick={() => socket.emit('unlock-buzzer')}>Réponse fausse, déverrouiller</button></div></> : <div className="admin-waiting"><strong>En attente d'un buzzer</strong><p>Le premier joueur qui appuie sera affiche ici.</p></div>}</section>
