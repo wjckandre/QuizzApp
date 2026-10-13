@@ -17,7 +17,10 @@ function App() {
   const [error, setError] = useState('')
   const [scorePoints, setScorePoints] = useState(10)
   const [mediaError, setMediaError] = useState('')
+  const [fullscreenError, setFullscreenError] = useState('')
+  const [isMediaFullscreen, setIsMediaFullscreen] = useState(false)
   const mediaRef = useRef(null)
+  const mediaFrameRef = useRef(null)
   const currentSlideRef = useRef({ category, slide })
   const buzzerAudioRef = useRef(null)
   const previousRoomStateRef = useRef({ phase: 'question', winner: null })
@@ -41,6 +44,7 @@ function App() {
     const updateRoom = (state) => {
       if (state.category !== currentSlideRef.current.category || state.slide !== currentSlideRef.current.slide) {
         setMediaError('')
+        setFullscreenError('')
       }
       currentSlideRef.current = { category: state.category, slide: state.slide }
       const previousRoomState = previousRoomStateRef.current
@@ -77,12 +81,15 @@ function App() {
     socket.on('connect_error', connectionError)
     socket.on('slide-media-play', playRoomMedia)
     socket.on('slide-media-pause', pauseRoomMedia)
+    const updateMediaFullscreen = () => setIsMediaFullscreen(document.fullscreenElement === mediaFrameRef.current)
+    document.addEventListener('fullscreenchange', updateMediaFullscreen)
     return () => {
       socket.off('room-state', updateRoom)
       socket.off('room-closed', closeRoom)
       socket.off('connect_error', connectionError)
       socket.off('slide-media-play', playRoomMedia)
       socket.off('slide-media-pause', pauseRoomMedia)
+      document.removeEventListener('fullscreenchange', updateMediaFullscreen)
     }
   }, [socket])
 
@@ -129,6 +136,23 @@ function App() {
     socket.emit('pause-slide-media')
   }
 
+  const toggleFullscreen = async (element) => {
+    if (!element) return
+    try {
+      if (document.fullscreenElement === element) {
+        await document.exitFullscreen()
+      } else if (element.requestFullscreen) {
+        await element.requestFullscreen()
+      } else {
+        throw new Error('Le plein écran n’est pas pris en charge par ce navigateur.')
+      }
+      setFullscreenError('')
+    } catch (error) {
+      console.error('Impossible de modifier le mode plein écran.', error)
+      setFullscreenError('Impossible de modifier le mode plein écran dans ce navigateur.')
+    }
+  }
+
   return (
     <main className="app">
       {view === 'home' && <section className="start-screen">
@@ -167,7 +191,7 @@ function App() {
           <nav className="category-grid">{categories.map((item) => <button className={item === category ? 'selected' : ''} disabled={role !== 'admin'} key={item} onClick={() => socket.emit('presentation-category', item)}>{item}</button>)}</nav>
           <section className="presentation-stage">
             <div className="slide-count">{currentSlide ? `${slide + 1} / ${currentSlides.length}` : 'Aucune slide'}</div>
-            <div className="slide-content"><h2>{currentSlide?.title ?? 'Aucune slide disponible'}</h2>{currentSlide?.image && <img src={currentSlide.image} alt="" />}{currentSlide?.media?.type === 'video' && <video className="slide-media" ref={mediaRef} src={currentSlide.media.src} playsInline preload="metadata" controls={Boolean(mediaError)} />}{currentSlide?.media?.type === 'audio' && <audio ref={mediaRef} src={currentSlide.media.src} preload="metadata" controls={Boolean(mediaError)} />}{role === 'admin' && currentSlide?.media && <div className="media-actions"><button className="button primary media-play" onClick={playCurrentMedia}>Lire {currentSlide.media.type === 'video' ? 'la vidéo' : 'l’audio'}</button><button className="button media-play" onClick={pauseCurrentMedia}>Pause</button></div>}{mediaError && <p className="error media-error">{mediaError}</p>}{role === 'admin' && currentSlide?.answer && <p className="slide-answer">{currentSlide.answer}</p>}</div>
+            <div className="slide-content"><h2>{currentSlide?.title ?? 'Aucune slide disponible'}</h2>{currentSlide?.image && <button className="slide-image-fullscreen" onClick={(event) => toggleFullscreen(event.currentTarget)} aria-label="Afficher l’image en plein écran" title="Cliquer pour afficher en plein écran"><img src={currentSlide.image} alt="" /></button>}{currentSlide?.media?.type === 'video' && <div className="slide-video-frame" ref={mediaFrameRef}><video className="slide-media" ref={mediaRef} src={currentSlide.media.src} playsInline preload="metadata" controls={Boolean(mediaError) || isMediaFullscreen} /><button className="fullscreen-button" onClick={() => toggleFullscreen(mediaFrameRef.current)} aria-label={isMediaFullscreen ? 'Quitter le plein écran' : 'Afficher la vidéo en plein écran'} title={isMediaFullscreen ? 'Quitter le plein écran' : 'Plein écran'}><span aria-hidden="true">⛶</span></button></div>}{currentSlide?.media?.type === 'audio' && <audio ref={mediaRef} src={currentSlide.media.src} preload="metadata" controls={Boolean(mediaError)} />}{role === 'admin' && currentSlide?.media && <div className="media-actions"><button className="button primary media-play" onClick={playCurrentMedia}>Lire {currentSlide.media.type === 'video' ? 'la vidéo' : 'l’audio'}</button><button className="button media-play" onClick={pauseCurrentMedia}>Pause</button></div>}{mediaError && <p className="error media-error">{mediaError}</p>}{fullscreenError && <p className="error media-error">{fullscreenError}</p>}{role === 'admin' && currentSlide?.answer && <p className="slide-answer">{currentSlide.answer}</p>}</div>
             <button className="slide-arrow previous" disabled={role !== 'admin' || slide === 0} onClick={() => socket.emit('presentation-slide', 'previous')} aria-label="Slide précédente">‹</button>
             <button className="slide-arrow next" disabled={role !== 'admin' || slide >= currentSlides.length - 1} onClick={() => socket.emit('presentation-slide', 'next')} aria-label="Slide suivante">›</button>
           </section>
