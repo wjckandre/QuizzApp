@@ -1,7 +1,7 @@
 export const slides = {
   'Présentation': [
     { title: 'Présentation', image: '/slides/presentation.png' },
-    { title: 'Présentation', image: '/slides/qr.svg' },
+    { title: 'Présentation', image: '/slides/qr.png' },
   ],
   'Échauffement': [
     { title: "Échauffement"},
