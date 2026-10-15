@@ -1,6 +1,7 @@
 export const slides = {
   'Présentation': [
     { title: 'Présentation', image: '/slides/presentation.png' },
+    { title: 'Présentation', image: '/slides/qr.svg' },
   ],
   'Échauffement': [
     { title: "Échauffement"},
