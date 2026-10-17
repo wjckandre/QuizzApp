@@ -53,7 +53,7 @@ function getRoom(socket) {
 
 io.on('connection', (socket) => {
   socket.on('create-room', async (callback = () => {}) => {
-    if (activeRoom || roomCreationPending) return callback({ ok: false, error: 'La room existe déjà ou est en cours d’ouverture. Rejoignez-la comme joueur.' })
+    //if (activeRoom || roomCreationPending) return callback({ ok: false, error: 'La room existe déjà ou est en cours d’ouverture. Rejoignez-la comme joueur.' })
     roomCreationPending = true
     try {
       const { defaultCategory } = await getQuizContent()
